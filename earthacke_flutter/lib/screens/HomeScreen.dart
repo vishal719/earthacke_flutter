@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'package:earthacke_flutter/models/Response.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -31,19 +32,22 @@ class MyHomeState extends State<MyHomePage> {
       ),
       body: Container(
         margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
-        child: ListView.builder(
-          itemCount: customItems.length,
-          itemBuilder: (context, index) {
-            return customItems[index];
-          },
+        child: RefreshIndicator(
+          onRefresh: fetchData,
+          child: ListView.builder(
+            itemCount: customItems.length,
+            itemBuilder: (context, index) {
+              return customItems[index];
+            },
+          ),
         ),
       ),
     );
   }
 
-  void fetchData() async {
+  Future<void> fetchData() async {
     const String url =
-        "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&orderby=time&minmag=6&limit=10";
+        "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&orderby=time&minmag=10&limit=10";
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -76,5 +80,6 @@ class MyHomeState extends State<MyHomePage> {
       // Handle network or other exceptions
       print('Error: $e');
     }
+    return ;
   }
 }

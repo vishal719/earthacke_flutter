@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/Response.dart';
 
@@ -15,6 +16,7 @@ class CustomListItem extends StatelessWidget {
         top: 20
       ),
       child: ListTile(
+        onTap: () => _launchURL(properties.url), // Pass the URL here,
         leading: CircleAvatar(
           radius: 30, // Adjust the radius as needed
           backgroundColor: getMagnitudeColor(properties.mag!.toDouble()), // Customize the background color
@@ -31,7 +33,7 @@ class CustomListItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              getPlace(properties.place??'Place'),
+              getCity(properties.place??'City'),
               style: const TextStyle(
                 fontSize: 16.0,
                 fontWeight: FontWeight.bold,
@@ -39,7 +41,7 @@ class CustomListItem extends StatelessWidget {
             ),
             const SizedBox(height: 8.0), // Add some space between the two text widgets
             Text(
-              getCity(properties.place??'Place'),
+              getPlace(properties.place??'Direction'),
               style: const TextStyle(
                 fontSize: 14.0,
                 color: Colors.grey,
@@ -47,24 +49,27 @@ class CustomListItem extends StatelessWidget {
             ),
           ],
         ),
-        trailing: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              properties.formattedDate(),
-              style: const TextStyle(
-                fontSize: 16.0,
+        trailing: Container(
+          margin: const EdgeInsets.only(top: 5),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                properties.formattedTime(),
+                style: const TextStyle(
+                  fontSize: 16.0,
+                ),
               ),
-            ),
-            const SizedBox(height: 8.0), // Add some space between the two text widgets
-            Text(
-              properties.formattedTime(),
-              style: const TextStyle(
-                fontSize: 14.0,
-                color: Colors.grey,
+              const SizedBox(height: 8.0), // Add some space between the two text widgets
+              Text(
+                properties.formattedDate(),
+                style: const TextStyle(
+                  fontSize: 14.0,
+                  color: Colors.grey,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         // Add any other customization here
       ),
@@ -122,7 +127,7 @@ class CustomListItem extends StatelessWidget {
         while (i < len && place[i] == ' ') {
           i++;
         }
-        firstPart = place.substring(0, i);
+        firstPart = place.substring(0, i).trim();
         secondPart = place.substring(i);
       } else {
         firstPart = '';
@@ -145,7 +150,7 @@ class CustomListItem extends StatelessWidget {
           i++;
         }
         firstPart = place.substring(0, i);
-        secondPart = place.substring(i);
+        secondPart = place.substring(i+2).trim();
       } else {
         firstPart = '';
         secondPart = place;
@@ -154,6 +159,15 @@ class CustomListItem extends StatelessWidget {
     }
 
     return "";
+  }
+
+  void _launchURL(String? url) async {
+    if (url != null && await canLaunch(url)) {
+      await launch(url);
+    } else {
+      // Handle the case where the URL can't be launched.
+      print('Could not launch $url');
+    }
   }
 
 }
